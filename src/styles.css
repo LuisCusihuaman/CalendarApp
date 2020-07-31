@@ -58,7 +58,7 @@ body {
   outline: none;
 }
 .react-datetime-picker__wrapper {
-  border: 0px solid gray !important;
+  border: 0 solid gray !important;
   display: flex;
 }
 /*FABS*/
