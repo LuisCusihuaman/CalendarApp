@@ -10,9 +10,9 @@ export const Navbar = () => {
   return (
     <div className="navbar navbar-dark bg-dark mb-4">
       <span className="navbar-brand">{name}</span>
-      <button className="btn btn-outline-danger">
+      <button className="btn btn-outline-danger" onClick={handleLogout}>
         <i className="fas fa-sign-out-alt"></i>
-        <span onClick={handleLogout}> Salir</span>
+        <span> Salir</span>
       </button>
     </div>
   );

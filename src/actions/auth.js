@@ -19,7 +19,7 @@ export const startLogin = (email, password) => {
     }
   };
 };
-export const starRegister = (email, password, name) => {
+export const startRegister = (email, password, name) => {
   return async (dispatch) => {
     const resp = await fetchSinToken('auth/new', { email, password, name }, 'POST');
     const body = await resp.json();
