@@ -1,6 +1,7 @@
 import { types } from '../types/types';
 import { fetchConToken } from '../helpers/fetch';
 import { prepareEvents } from '../reducers/prepareEvents';
+import Swal from 'sweetalert2';
 
 export const eventStartAddNew = (event) => {
   return async (dispatch, getState) => {
@@ -10,7 +11,6 @@ export const eventStartAddNew = (event) => {
     if (body.ok) {
       event.id = body.evento.id;
       event.user = { _id: uid, name: name };
-      console.log(event);
       dispatch(eventAddNew(event));
     }
   };
@@ -30,6 +30,23 @@ export const eventUpdated = (event) => ({
   type: types.eventUpdated,
   payload: event,
 });
+
+export const eventStartUpdate = (event) => {
+  return async (dispatch) => {
+    try {
+      const resp = await fetchConToken(`events/${event.id}`, event, 'PUT');
+      const body = await resp.json();
+      if (body.ok) {
+        dispatch(eventUpdated(event));
+      } else {
+        Swal.fire('Error', body.msg, 'error');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};
+
 export const eventDeleted = () => ({ type: types.eventDeleted });
 
 export const eventStartLoading = () => {
