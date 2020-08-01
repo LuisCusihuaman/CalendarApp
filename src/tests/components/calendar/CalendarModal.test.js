@@ -48,6 +48,9 @@ const wrapper = mount(
 );
 
 describe('Pruebas en <CalendarModal />', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   test('debe de mostrar el modal', () => {
     expect(wrapper.find('Modal').prop('isOpen')).toBe(true);
   });
@@ -55,5 +58,9 @@ describe('Pruebas en <CalendarModal />', () => {
     wrapper.find('form').simulate('submit', { preventDefault() {} });
     expect(eventStartUpdate).toHaveBeenCalledWith(initState.calendar.activeEvent);
     expect(eventClearActiveEvent).toHaveBeenCalled();
+  });
+  test('debe de mostrar un error en el input si falta el titulo', () => {
+    wrapper.find('form').simulate('submit', { preventDefault() {} });
+    expect(wrapper.find('input[name="title"]').hasClass('is-invalid')).toBe(true);
   });
 });
