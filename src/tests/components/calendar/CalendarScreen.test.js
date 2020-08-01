@@ -31,6 +31,7 @@ const wrapper = mount(
     <CalendarScreen />
   </Provider>,
 );
+
 describe('Pruebas en <CalendarScreen/>', () => {
   test('debe de mosrarse correctamente', () => {
     expect(wrapper).toMatchSnapshot();
