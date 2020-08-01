@@ -8,11 +8,11 @@ import moment from 'moment';
 
 import '@testing-library/jest-dom';
 import { CalendarModal } from '../../../components/calendar/CalendarModal';
-import { eventStartUpdate, eventClearActiveEvent } from '../../../actions/events';
-
+import { eventStartUpdate, eventClearActiveEvent, eventStartAddNew } from '../../../actions/events';
 jest.mock('../../../actions/events', () => ({
   eventStartUpdate: jest.fn(),
   eventClearActiveEvent: jest.fn(),
+  eventStartAddNew: jest.fn(),
 }));
 
 const middlewares = [thunk];
@@ -62,5 +62,40 @@ describe('Pruebas en <CalendarModal />', () => {
   test('debe de mostrar un error en el input si falta el titulo', () => {
     wrapper.find('form').simulate('submit', { preventDefault() {} });
     expect(wrapper.find('input[name="title"]').hasClass('is-invalid')).toBe(true);
+  });
+  test('debe de crear un nuevo evento', () => {
+    const initState = {
+      calendar: {
+        events: [],
+        activeEvent: null,
+      },
+      auth: {
+        uid: '123',
+        name: 'Fernando',
+      },
+      ui: { modalOpen: true },
+    };
+
+    const store = mockStore(initState);
+    store.dispatch = jest.fn();
+
+    const wrapper = mount(
+      <Provider store={store}>
+        <CalendarModal />
+      </Provider>,
+    );
+
+    wrapper
+      .find('input[name="title"]')
+      .simulate('change', { target: { name: 'title', value: 'Hola pruebas' } });
+    wrapper.find('form').simulate('submit', { preventDefault() {} });
+
+    expect(eventStartAddNew).toHaveBeenCalledWith({
+      end: expect.anything(),
+      start: expect.anything(),
+      title: 'Hola pruebas',
+      notes: '',
+    });
+    expect(eventClearActiveEvent).toHaveBeenCalled();
   });
 });
