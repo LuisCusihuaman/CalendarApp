@@ -31,4 +31,20 @@ describe('Pruebas en <AppRouter/>', () => {
     expect(wrapper).toMatchSnapshot();
     expect(wrapper.find('.login-container').exists()).toBe(true);
   });
+  test('debe de mostrar la ruta privada', () => {
+    const initialState = {
+      ui: { modalOpen: false },
+      calendar: {
+        events: [],
+      },
+      auth: { checking: false, uid: '123', name: 'Pepito' },
+    };
+    const store = mockStore(initialState);
+    const wrapper = mount(
+      <Provider store={store}>
+        <AppRouter />
+      </Provider>,
+    );
+    expect(wrapper.find('.calendar-screen').exists()).toBe(true);
+  });
 });
