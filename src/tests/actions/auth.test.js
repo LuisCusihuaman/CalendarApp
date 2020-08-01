@@ -2,7 +2,7 @@ import configureStore from 'redux-mock-store'; //ES6 modules
 import thunk from 'redux-thunk';
 import Swal from 'sweetalert2';
 import '@testing-library/jest-dom';
-import { startLogin, startRegister } from '../../actions/auth';
+import { startLogin, startRegister, startChecking } from '../../actions/auth';
 import { types } from '../../types/types';
 import * as fetchModule from '../../helpers/fetch';
 
@@ -19,6 +19,7 @@ describe('Pruebas en la acciones Auth', () => {
     store = mockStore(initialState);
     jest.clearAllMocks();
   });
+
   test('startLogin correcto ', async () => {
     await store.dispatch(startLogin('luis@luis.com', '123456'));
     const actions = store.getActions();
@@ -33,6 +34,7 @@ describe('Pruebas en la acciones Auth', () => {
     expect(localStorage.setItem).toHaveBeenCalledWith('token', expect.any(String));
     expect(localStorage.setItem).toHaveBeenCalledWith('token-init-date', expect.any(Number));
   });
+
   test('should startLogin incorrectly', async () => {
     await store.dispatch(startLogin('luis@luis.com', '123456789'));
     let actions = store.getActions();
@@ -42,6 +44,7 @@ describe('Pruebas en la acciones Auth', () => {
     actions = store.getActions();
     expect(Swal.fire).toHaveBeenCalledWith('Error', 'Un usuario no existe con ese email', 'error');
   });
+
   test('startRegister correcto', async () => {
     fetchModule.fetchSinToken = jest.fn(() => ({
       json() {
@@ -64,5 +67,27 @@ describe('Pruebas en la acciones Auth', () => {
     });
     expect(localStorage.setItem).toHaveBeenCalledWith('token', 'ABC123ABC');
     expect(localStorage.setItem).toHaveBeenCalledWith('token-init-date', expect.any(Number));
+  });
+
+  test('startChecking correcto', async () => {
+    fetchModule.fetchConToken = jest.fn(() => ({
+      json() {
+        return {
+          ok: true,
+          uid: '123',
+          name: 'carlos',
+          token: 'ABC123ABC',
+        };
+      },
+    }));
+
+    await store.dispatch(startChecking());
+    const actions = store.getActions();
+
+    expect(actions[0]).toEqual({
+      type: types.authLogin,
+      payload: { uid: '123', name: 'carlos' },
+    });
+    expect(localStorage.setItem).toHaveBeenCalledWith('token', 'ABC123ABC');
   });
 });
