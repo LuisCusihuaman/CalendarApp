@@ -5,9 +5,14 @@ import configureStore from 'redux-mock-store'; //ES6 modules
 import thunk from 'redux-thunk';
 import '@testing-library/jest-dom';
 import { LoginScreen } from '../../../components/auth/LoginScreen';
-import { startLogin } from '../../../actions/auth';
+import { startLogin, startRegister } from '../../../actions/auth';
+import Swal from 'sweetalert2';
 
-jest.mock('../../../actions/auth', () => ({ startLogin: jest.fn() }));
+jest.mock('../../../actions/auth', () => ({
+  startLogin: jest.fn(),
+  startRegister: jest.fn(),
+}));
+jest.mock('sweetalert2', () => ({ fire: jest.fn() }));
 
 const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
@@ -21,9 +26,14 @@ const wrapper = mount(
   </Provider>,
 );
 describe('Pruebas en <LoginScreen/>', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('debe de mostrarse correctamente', () => {
     expect(wrapper).toMatchSnapshot();
   });
+
   test('debe de llamar el dispatch del login', () => {
     wrapper.find("input[name='lEmail']").simulate('change', {
       target: {
@@ -41,5 +51,52 @@ describe('Pruebas en <LoginScreen/>', () => {
       preventDefault() {},
     });
     expect(startLogin).toHaveBeenCalledWith('test3@test3.com', '123456');
+  });
+
+  test('No hay registro si las contraseñas son diferentes', () => {
+    wrapper.find("input[name='rPassword1']").simulate('change', {
+      target: {
+        name: 'rPassword1',
+        value: '123456',
+      },
+    });
+    wrapper.find("input[name='rPassword2']").simulate('change', {
+      target: {
+        name: 'rPassword2',
+        value: '1234567',
+      },
+    });
+
+    wrapper.find('form').at(1).prop('onSubmit')({
+      preventDefault() {},
+    });
+
+    expect(startRegister).not.toHaveBeenCalled();
+    expect(Swal.fire).toHaveBeenCalledWith(
+      'Error',
+      'Las contraseñas deben de ser iguales',
+      'error',
+    );
+  });
+
+  test('deberia llamarse startRegister si las contraseñas son iguales', () => {
+    wrapper.find("input[name='rPassword1']").simulate('change', {
+      target: {
+        name: 'rPassword1',
+        value: '123456',
+      },
+    });
+    wrapper.find("input[name='rPassword2']").simulate('change', {
+      target: {
+        name: 'rPassword2',
+        value: '123456',
+      },
+    });
+
+    wrapper.find('form').at(1).prop('onSubmit')({
+      preventDefault() {},
+    });
+
+    expect(startRegister).toHaveBeenCalledWith('nando@nando.com', '123456', 'Nando');
   });
 });
