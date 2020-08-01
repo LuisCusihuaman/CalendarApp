@@ -20,4 +20,15 @@ describe('Pruebas en <AppRouter/>', () => {
     );
     expect(wrapper.find('h5').exists()).toBe(true);
   });
+  test('debe de mostrar la ruta publica', () => {
+    const initialState = { auth: { checking: false, uid: null } };
+    const store = mockStore(initialState);
+    const wrapper = mount(
+      <Provider store={store}>
+        <AppRouter />
+      </Provider>,
+    );
+    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.find('.login-container').exists()).toBe(true);
+  });
 });
